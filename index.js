@@ -1,3 +1,10 @@
+// Comes from serializing `Form`
+var data = {
+    fields: [],
+    productLink: 'https://bmejegy.hu/adsfasd',
+    password: ''
+};
+
 $('#startPayment').on('click', () => {
     // Password form filler
     window.login = $("<form action='http://www.bmejegy.hu/wp-login.php?action=postpass' method='POST' target='frame'></form>");
@@ -10,30 +17,38 @@ $('#startPayment').on('click', () => {
         product.append('<input type="hidden" name="' + field + '" value="' + value + '">');
     });
 
-    $('body').append(login).append(product);
+    window.cartclear = $('<form action="http://www.bmejegy.hu/fiokom/customer-logout/" method="GET" target="frame"></form>');
 
-    // Step 0: login
-    // Step 1: submit product to cart
-    // Step 2: redirect to checkout
-    login.submit();
+    $('body').append(login).append(product).append(cartclear);
 
+    cartclear.submit();
+
+    let frame = $('iframe[name=frame]').get()[0];
     let step = 0;
 
-    let frameOnload = () => {
+    // Step 0: clear previous cart
+    // Step 1: login form
+    // Step 2: submit product to cart
+    // Step 3: redirect to checkout
+    let listener = () => {
         step++;
 
-        if (step === 1) {
-            product.submit();
-        } else {
-            location.href = 'http://bmejegy.hu/penztar';
+        switch (step) {
+            case 1:
+                login.submit();
+                break;
+            case 2:
+                product.submit();
+                break;
+            case 3:
+                location.href = 'http://bmejegy.hu/penztar';
+                break;
         }
     };
 
-    let frame = $('iframe[name=frame]').get()[0];
-
     if (frame.attachEvent){
-        frame.attachEvent("onload", frameOnload);
+        frame.attachEvent("onload", listener);
     } else {
-        frame.onload = frameOnload;
+        frame.onload = listener;
     }
 });
