@@ -6,6 +6,9 @@ var data = {
 };
 
 $('#startPayment').on('click', () => {
+    $('#startPayment').hide();
+    $('.loader').removeClass('hidden');
+
     // Password form filler
     window.login = $("<form action='http://www.bmejegy.hu/wp-login.php?action=postpass' method='POST' target='frame'></form>");
     login.append('<input type="hidden" name="post_password" value="' + data.password + '">');
