@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Hasher for wordpress required password format
+ */
 class Hasher
 {
     protected $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';

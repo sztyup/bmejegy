@@ -5,7 +5,7 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Str;
 
-abstract class Form implements \JsonSerializable
+class Form implements \JsonSerializable
 {
     /** @var integer */
     protected $productId;
@@ -53,8 +53,25 @@ abstract class Form implements \JsonSerializable
     /**
      * @return array
      */
-    abstract public function getFields(): array;
+    public function getFields(): array
+    {
+        return [
+            'product_id' => $this->productId,
+            '_wp_http_referer' => $this->link,
+            'input_1.3' => 'Vezetéknév',
+            'input_1.6' => 'Keresztnév',
+            'input_2' => 'Neptun kód',
+            'input_2_2' => 'Igényelt IP',
+            'gform_old_submit' => $this->formId,
+            'add-to-cart' => $this->productId,
+            'gform_form_id' => $this->formId,
+            'redirect_to' => 'http://bmejegy.hu/penztar/'
+        ];
+    }
 
+    /**
+     * Validate submitted data, server sidely
+     */
     public function validateExternally()
     {
         $client = new Client([
@@ -74,7 +91,7 @@ abstract class Form implements \JsonSerializable
         ]);
 
         if ($result->getStatusCode() !== 200) {
-            throw new BmejegyException('Cart adding failed with http code: ' . $result->getStatusCode());
+            throw new \RuntimeException('Cart adding failed with http code: ' . $result->getStatusCode());
         }
 
         if (Str::contains($body = $result->getBody()->getContents(), 'hozzá lett adva a kosaradhoz')) {
